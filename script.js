@@ -1,6 +1,41 @@
 let stepIndex = 0;
 let isCooking = false;
 let isCooked = false;
+let prepSeconds = 2700; // 45 minutes
+let prepInterval = null;
+
+function startTimer() {
+  clearInterval(prepInterval);
+  timer = 0;
+  document.getElementById("prep-timer").textContent = `Timer: 0s`;
+  prepInterval = setInterval(() => {
+    timer++;
+    document.getElementById("prep-timer").textContent = `Timer: ${timer}s`;
+  }, 1000);
+}
+
+function stopTimer() {
+  clearInterval(prepInterval);
+}
+
+function startPrepTimer() {
+  clearInterval(prepInterval);
+  updatePrepDisplay();
+  prepInterval = setInterval(() => {
+    if (prepSeconds > 0) {
+      prepSeconds--;
+      updatePrepDisplay();
+    } else {
+      clearInterval(prepInterval);
+    }
+  }, 1000);
+}
+
+function updatePrepDisplay() {
+  const minutes = Math.floor(prepSeconds / 60).toString().padStart(2, "0");
+  const seconds = (prepSeconds % 60).toString().padStart(2, "0");
+  document.getElementById("prep-timer").textContent = `Prep Time Left: ${minutes}:${seconds}`;
+}
 
 function toggleSection(id) {
   const el = document.getElementById(id);
@@ -31,6 +66,8 @@ function startCooking() {
   isCooking = true;
   highlightStep(stepIndex);
   updateProgress();
+  startTimer();
+  startPrepTimer();
   document.querySelector("button[onclick='startCooking()']").disabled = true;
   document.querySelector("button[onclick='nextStep()']").disabled = false;
 }
@@ -65,6 +102,10 @@ function resetCooking() {
   stepIndex = 0;
   isCooking = false;
   isCooked = false;
+  prepSeconds = 2700;
+  clearInterval(prepInterval);
+  updatePrepDisplay();
+  stopTimer();
   steps.forEach((step) => (step.style.background = ""));
   document.getElementById("progress").style.width = "0%";
   document.querySelector("button[onclick='startCooking()']").disabled =
