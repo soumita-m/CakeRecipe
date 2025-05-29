@@ -24,6 +24,11 @@ h1 {
   color: #333;
 }
 
+.image-container {
+  padding-left: 20%;
+  padding-right: 20%;
+}
+
 .dish-image {
   width: 100%;
   border-radius: 12px;
@@ -87,4 +92,35 @@ button:disabled {
 
 button:disabled:hover {
   background: #d1d5db;
+}
+
+.print-only {
+  display: none;
+}
+
+@media print {
+  body {
+    background: white;
+  }
+
+  .recipe-card {
+    box-shadow: none;
+    padding: 0;
+  }
+
+  button, .progress-bar, #timer, #prep-timer {
+    display: none !important;
+  }
+
+  .print-only {
+    display: inline;
+  }
+
+  .screen-only {
+    display: none;
+  }
+
+  #ingredients, #steps {
+    display: block !important;
+  }
 }
