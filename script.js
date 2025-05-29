@@ -1,31 +1,20 @@
 let stepIndex = 0;
 let isCooking = false;
 let isCooked = false;
-let prepSeconds = 2700; // 45 minutes
+const prepSecondsConstant = 2700; // 45 minutes
+let prepSeconds = prepSecondsConstant;
 let prepInterval = null;
-
-function startTimer() {
-  clearInterval(prepInterval);
-  timer = 0;
-  document.getElementById("prep-timer").textContent = `Timer: 0s`;
-  prepInterval = setInterval(() => {
-    timer++;
-    document.getElementById("prep-timer").textContent = `Timer: ${timer}s`;
-  }, 1000);
-}
-
-function stopTimer() {
-  clearInterval(prepInterval);
-}
+let stepSeconds = [Math.floor(prepSeconds/9), Math.floor(prepSeconds*2/9), prepSeconds - Math.floor(prepSeconds/9) - Math.floor(prepSeconds*2/9)];
 
 function startPrepTimer() {
   clearInterval(prepInterval);
   updatePrepDisplay();
   prepInterval = setInterval(() => {
-    if (prepSeconds > 0) {
+    stepRemainingSeconds = prepSecondsConstant - (stepSeconds.slice(0, stepIndex + 1)).reduce((a, b) => a + b, 0);
+    if (prepSeconds > stepRemainingSeconds) {
       prepSeconds--;
       updatePrepDisplay();
-    } else {
+    } else if (prepSeconds <= 0) {
       clearInterval(prepInterval);
     }
   }, 1000);
@@ -66,13 +55,13 @@ function startCooking() {
   isCooking = true;
   highlightStep(stepIndex);
   updateProgress();
-  startTimer();
   startPrepTimer();
   document.querySelector("button[onclick='startCooking()']").disabled = true;
   document.querySelector("button[onclick='nextStep()']").disabled = false;
 }
 
 function nextStep() {
+  prepSeconds = prepSecondsConstant - (stepSeconds.slice(0, stepIndex + 1)).reduce((a, b) => a + b, 0);
   const steps = document.querySelectorAll("#steps li");
   if (stepIndex < steps.length - 1) {
     stepIndex++;
@@ -102,10 +91,9 @@ function resetCooking() {
   stepIndex = 0;
   isCooking = false;
   isCooked = false;
-  prepSeconds = 2700;
+  prepSeconds = prepSecondsConstant;
   clearInterval(prepInterval);
   updatePrepDisplay();
-  stopTimer();
   steps.forEach((step) => (step.style.background = ""));
   document.getElementById("progress").style.width = "0%";
   document.querySelector("button[onclick='startCooking()']").disabled =
